@@ -1,0 +1,24 @@
+{
+  "name": "cpr-api",
+  "version": "1.0.0",
+  "description": "API para gerenciamento de dados de reuniões congregacionais",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedroD630/cpr-api.git"
+  },
+  "author": "Pedro Silva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pedroD630/cpr-api/issues"
+  },
+  "homepage": "https://github.com/pedroD630/cpr-api#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
