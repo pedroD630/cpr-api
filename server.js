@@ -1,11 +1,17 @@
 import express from 'express';
 import reuniaoRoutes from './routes/reuniaoRoutes.js';
+import { connectDB } from "./utils/database.js";
 
 const server = express();
 
 server.use(express.json());
 server.use(express.urlencoded({extended: false}));
 
-server.use('/api/reuniao', reuniaoRoutes);
+let db;
 
-server.listen(8000, () => {console.log(`Running server on port 8000`);})
+server.use('/api/reuniao', reuniaoRoutes(db));
+
+server.listen(8000, async () => {
+    db = await connectDB();
+    console.log(`Running server on port 8000`);
+})

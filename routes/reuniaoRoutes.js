@@ -1,7 +1,9 @@
 import express from 'express';
+import {inserirReuniao} from '../controllers/reuniaoController.js';
 
-const router = express.Router();
+export default function reunioesRoutes(db) {
+    const router = express.Router();
 
-router.post('/', inserirReuniao);
-
-export default router;
+    router.post('/', inserirReuniao(db));
+    return router;
+}
