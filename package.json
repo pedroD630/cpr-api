@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/pedroD630/cpr-api#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
   }
 }
