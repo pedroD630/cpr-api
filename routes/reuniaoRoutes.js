@@ -1,8 +1,9 @@
 import express from 'express';
-import {inserirReuniao} from '../controllers/reuniaoController.js';
+import {inserirReuniao, deletarReuniao} from '../controllers/reuniaoController.js';
 
 const router = express.Router();
 
 router.post('/', inserirReuniao);
+router.delete('/:id', deletarReuniao);
 
 export default router;
