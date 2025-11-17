@@ -9,11 +9,8 @@ server.use(cors());
 server.use(express.json());
 server.use(express.urlencoded({extended: false}));
 
-let db;
-
-server.use('/api/reuniao', reuniaoRoutes(db));
+server.use('/api/reuniao', reuniaoRoutes);
 
 server.listen(8000, async () => {
-    db = await connectDB();
     console.log(`Running server on port 8000`);
 })
