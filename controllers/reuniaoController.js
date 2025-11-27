@@ -57,7 +57,9 @@ export async function deletarReuniao(req, res, next) {
         const result = await db.collection("reunioes").deleteOne({_id: new ObjectId(reuniaoId)});
 
         if(result.deletedCount === 0) {
-            return res.status(404).json({ erro: "Reunião não encontrada"});
+            const error = new Error("Reunião não encontrada");
+            error.status(404);
+            return next;
         }
 
         return res.json({
