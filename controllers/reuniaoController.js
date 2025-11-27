@@ -7,8 +7,9 @@ export async function inserirReuniao(req, res, next) {
 
         const result = await db.collection("reunioes").insertOne(dados);
 
-        res.json({
+        res.status(200).json({
             sucesso: true,
+            message: "Reunião gravada com sucesso",
             id: result.insertedId
         });
     } catch (error) {
