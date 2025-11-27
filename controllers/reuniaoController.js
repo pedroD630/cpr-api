@@ -25,7 +25,9 @@ export async function atualizarReuniao(req, res, next) {
         const dados = req.body;
 
         if (!ObjectId.isValid(reuniaoId)) {
-            return res.status(400).json({ erro: "ID inválido" });
+            const error = new Error("ID inválido");
+            error.status(400);
+            return next;
         }
 
         const result = db.collection("reunioes").updateOne( {_id: new ObjectId(reuniaoId)}, { $set: dados } ) 
@@ -47,7 +49,9 @@ export async function deletarReuniao(req, res, next) {
         const reuniaoId = req.params.id;
 
         if (!ObjectId.isValid(reuniaoId)) {
-            return res.status(400).json({ erro: "ID inválido" });
+            const error = new Error("ID inválido");
+            error.status(400);
+            return next;
         }
 
         const result = await db.collection("reunioes").deleteOne({_id: new ObjectId(reuniaoId)});
