@@ -14,7 +14,7 @@ export async function inserirReuniao(req, res, next) {
         });
 
     } catch (error) {
-        next(error); // Agora usa o errorHandler
+        next(error);
     }
 }
 
