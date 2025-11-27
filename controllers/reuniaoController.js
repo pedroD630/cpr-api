@@ -17,6 +17,29 @@ export async function inserirReuniao(req, res, next) {
 
 }
 
+export async function atualizarReuniao(req, res, next) {
+    try {
+        const db = req.app.locals.db;
+        const reuniaoId = req.params.id;
+        const dados = req.body;
+
+        if (!ObjectId.isValid(reuniaoId)) {
+            return res.status(400).json({ erro: "ID inválido" });
+        }
+
+        const result = db.collection("reunioes").updateOne( {_id: new ObjectId(reuniaoId)}, { $set: dados } ) 
+
+        res.status(200).json({
+            sucesso: true,
+            mensagem: "Reunião atualizada com sucesso",
+            result
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({erro: "Erro interno do servidor"});
+    }
+}
+
 export async function deletarReuniao(req, res, next) {
     try {
         const db = req.app.locals.db;
