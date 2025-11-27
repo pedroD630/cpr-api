@@ -2,20 +2,20 @@ import { ObjectId } from "mongodb";
 
 export async function inserirReuniao(req, res, next) {
     try {
-        const db = req.server.locals.db;
+        const db = req.app.locals.db;
         const dados = req.body;
 
         const result = await db.collection("reunioes").insertOne(dados);
 
-        res.status(200).json({
+        return res.status(200).json({
             sucesso: true,
             message: "Reunião gravada com sucesso",
             id: result.insertedId
         });
-    } catch (error) {
-        console.log(error);
-    }
 
+    } catch (error) {
+        next(error); // Agora usa o errorHandler
+    }
 }
 
 export async function atualizarReuniao(req, res, next) {
@@ -26,20 +26,23 @@ export async function atualizarReuniao(req, res, next) {
 
         if (!ObjectId.isValid(reuniaoId)) {
             const error = new Error("ID inválido");
-            error.status(400);
-            return next;
+            error.status = 400;
+            return next(error);
         }
 
-        const result = db.collection("reunioes").updateOne( {_id: new ObjectId(reuniaoId)}, { $set: dados } ) 
+        const result = await db.collection("reunioes").updateOne(
+            { _id: new ObjectId(reuniaoId) },
+            { $set: dados }
+        );
 
-        res.status(200).json({
+        return res.status(200).json({
             sucesso: true,
             mensagem: "Reunião atualizada com sucesso",
             result
-        })
+        });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({erro: "Erro interno do servidor"});
+        next(error);
     }
 }
 
@@ -50,24 +53,26 @@ export async function deletarReuniao(req, res, next) {
 
         if (!ObjectId.isValid(reuniaoId)) {
             const error = new Error("ID inválido");
-            error.status(400);
-            return next;
+            error.status = 400;
+            return next(error);
         }
 
-        const result = await db.collection("reunioes").deleteOne({_id: new ObjectId(reuniaoId)});
+        const result = await db.collection("reunioes").deleteOne({
+            _id: new ObjectId(reuniaoId)
+        });
 
-        if(result.deletedCount === 0) {
+        if (result.deletedCount === 0) {
             const error = new Error("Reunião não encontrada");
-            error.status(404);
-            return next;
+            error.status = 404;
+            return next(error);
         }
 
         return res.json({
             sucesso: true,
             mensagem: "Reunião excluída"
         });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({erro: "Erro interno do servidor"});
+        next(error);
     }
 }
