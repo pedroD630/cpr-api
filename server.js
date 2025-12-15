@@ -11,8 +11,10 @@ server.use(express.urlencoded({extended: false}));
 
 server.use('/api/reuniao', reuniaoRoutes);
 
-server.listen(8000, async () => {
+const PORT = process.env.PORT || 8000;
+
+server.listen(PORT, async () => {
     const db = await connectDB();
     server.locals.db = db;  
-    console.log(`Running server on port 8000`);
+    console.log(`Running server on port ${PORT}`);
 })
