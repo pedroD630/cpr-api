@@ -1,63 +1,46 @@
-import { ObjectId } from "mongodb";
+import { ErroApi } from "../utils/erroApi.js";
+import { validarFiltros, validarReuniao } from "../utils/validarReuniao.js";
 
-export async function getReuniao(req, res, next) {
-    try {
-        const db = req.app.locals.db;
-        const dataReuniao = req.query.data;
+export async function getReuniao(req, res) {
+    const { data: dataReuniao, tipo } = validarFiltros(req.query);
 
-        if(!dataReuniao)
-        {
-            const allReunioes = await db.collection("reunioes").find().toArray();
-            res.json(allReunioes);
-        } else {
-            const dadosReuniao = await db.collection("reunioes").findOne({data: dataReuniao});
-            res.json(dadosReuniao);
-        }
+    let consulta = req.supabase
+        .from("historico_reunioes")
+        .select("*")
+        .order("data", { ascending: false })
+        .order("tipo_reuniao");
 
-    } catch (error) {
-        res.status(500).json({message: `${error}`});
-        console.log(error);
-    }
+    if (dataReuniao) consulta = consulta.eq("data", dataReuniao);
+    if (tipo) consulta = consulta.eq("tipo_reuniao", tipo);
+
+    const { data, error } = await consulta;
+    if (error) throw error;
+
+    res.json(data);
 }
 
-export async function inserirReuniao(req, res, next) {
-    try {
-        const db = req.app.locals.db;
-        const dados = req.body;
+export async function inserirReuniao(req, res) {
+    const parametros = validarReuniao(req.body);
 
-        const result = await db.collection("reunioes").insertOne(dados);
+    const { data: id, error } = await req.supabase.rpc("salvar_reuniao", parametros);
+    if (error) throw error;
 
-        res.json({
-            sucesso: true,
-            id: result.insertedId
-        });
-    } catch (error) {
-        console.log(error);
-    }
-
+    res.status(201).json({ sucesso: true, id });
 }
 
-export async function deletarReuniao(req, res, next) {
-    try {
-        const db = req.app.locals.db;
-        const reuniaoId = req.params.id;
+export async function deletarReuniao(req, res) {
+    const { data, error } = await req.supabase
+        .from("reunioes")
+        .delete()
+        .eq("id", req.params.id)
+        .select("id");
 
-        if (!ObjectId.isValid(reuniaoId)) {
-            return res.status(400).json({ erro: "ID inválido" });
-        }
+    if (error) throw error;
 
-        const result = await db.collection("reunioes").deleteOne({_id: new ObjectId(reuniaoId)});
-
-        if(result.deletedCount === 0) {
-            return res.status(404).json({ erro: "Reunião não encontrada"});
-        }
-
-        return res.json({
-            sucesso: true,
-            mensagem: "Reunião excluída"
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({erro: "Erro interno do servidor"});
+    // Reunião de outra congregação também cai aqui: o RLS a esconde.
+    if (data.length === 0) {
+        throw new ErroApi(404, "Reunião não encontrada");
     }
+
+    res.json({ sucesso: true, mensagem: "Reunião excluída" });
 }
