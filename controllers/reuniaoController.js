@@ -1,8 +1,28 @@
 import { ObjectId } from "mongodb";
 
+export async function getReuniao(req, res, next) {
+    try {
+        const db = req.app.locals.db;
+        const dataReuniao = req.query.data;
+
+        if(!dataReuniao)
+        {
+            const allReunioes = await db.collection("reunioes").find().toArray();
+            res.json(allReunioes);
+        } else {
+            const dadosReuniao = await db.collection("reunioes").findOne({data: dataReuniao});
+            res.json(dadosReuniao);
+        }
+
+    } catch (error) {
+        res.status(500).json({message: `${error}`});
+        console.log(error);
+    }
+}
+
 export async function inserirReuniao(req, res, next) {
     try {
-        const db = req.server.locals.db;
+        const db = req.app.locals.db;
         const dados = req.body;
 
         const result = await db.collection("reunioes").insertOne(dados);
