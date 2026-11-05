@@ -47,7 +47,7 @@ As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_to
 O login usa os mesmos campos, sem `nome_congregacao`. A resposta traz a sessão:
 
 ```json
-{ "sessao": { "access_token": "...", "refresh_token": "...", "expires_at": 1793980800 } }
+{ "sessao": { "access_token": "...", "refresh_token": "...", "expires_at": 1793980800, "usuario_id": "..." } }
 ```
 
 No cadastro, quando o projeto exige confirmação de e-mail, `sessao` vem nula e `confirmacao_pendente` vem `true`.

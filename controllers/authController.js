@@ -5,7 +5,8 @@ function formatarSessao(sessao) {
     return {
         access_token: sessao.access_token,
         refresh_token: sessao.refresh_token,
-        expires_at: sessao.expires_at
+        expires_at: sessao.expires_at,
+        usuario_id: sessao.user.id
     };
 }
 
