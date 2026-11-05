@@ -4,6 +4,9 @@
   "description": "API para gerenciamento de dados de reuniões congregacionais",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node --env-file=.env server.js",
     "dev": "node --env-file=.env --watch server.js",
@@ -20,8 +23,8 @@
   },
   "homepage": "https://github.com/pedroD630/cpr-api#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "mongodb": "^7.0.0"
+    "express": "^5.1.0"
   }
 }
