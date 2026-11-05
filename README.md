@@ -41,10 +41,10 @@ As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_to
 ### Cadastro e login
 
 ```json
-{ "email": "congregacao@exemplo.com", "senha": "...", "nome_congregacao": "Central" }
+{ "email": "congregacao@exemplo.com", "senha": "...", "nome_congregacao": "Central", "aceitou_termos": true }
 ```
 
-O login usa os mesmos campos, sem `nome_congregacao`. A resposta traz a sessão:
+O login usa só `email` e `senha`. A data do aceite dos termos fica nos metadados do usuário, no Supabase Auth. A resposta traz a sessão:
 
 ```json
 { "sessao": { "access_token": "...", "refresh_token": "...", "expires_at": 1793980800, "usuario_id": "..." } }
