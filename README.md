@@ -34,28 +34,39 @@ As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_to
 
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/auth/cadastro` | Cria o login e a congregação |
 | POST | `/api/auth/login` | Entra e devolve a sessão |
 | POST | `/api/auth/renovar` | Troca o `refresh_token` por uma nova sessão |
-| GET | `/api/congregacao` 🔒 | Dados da congregação logada |
+| PUT | `/api/auth/senha` 🔒 | Troca a senha. Corpo: `senha_atual` e `nova_senha` |
+| GET | `/api/congregacao` 🔒 | Dados da congregação logada, incluindo `admin` |
+| POST | `/api/congregacao` 🔒 | Só administradores. Cadastra uma congregação |
 | GET | `/api/reuniao` 🔒 | Histórico, da reunião mais recente para a mais antiga. Filtros opcionais: `?data=2026-11-04` e `?tipo=mds` |
 | POST | `/api/reuniao` 🔒 | Registra uma reunião concluída |
 | PUT | `/api/reuniao/:id` 🔒 | Substitui os dados e as partes de uma reunião, com o mesmo corpo do POST |
 | DELETE | `/api/reuniao/:id` 🔒 | Exclui uma reunião |
 
-### Cadastro e login
+### Login
 
 ```json
-{ "email": "congregacao@exemplo.com", "senha": "...", "nome_congregacao": "Central", "aceitou_termos": true }
+{ "login": "admin", "senha": "..." }
 ```
 
-O login usa só `email` e `senha`. A data do aceite dos termos fica nos metadados do usuário, no Supabase Auth. A resposta traz a sessão:
+`login` aceita um e-mail ou um nome de usuário. O Supabase Auth exige e-mail, então um nome de usuário vira `usuario@cpr-app.onrender.com`, que nunca recebe mensagens. A resposta traz a sessão:
 
 ```json
 { "sessao": { "access_token": "...", "refresh_token": "...", "expires_at": 1793980800, "usuario_id": "..." } }
 ```
 
-No cadastro, quando o projeto exige confirmação de e-mail, `sessao` vem nula e `confirmacao_pendente` vem `true`.
+### Cadastro de congregação
+
+Só um administrador cadastra congregações, em `POST /api/congregacao`:
+
+```json
+{ "nome_congregacao": "Central", "login": "central", "senha": "...", "aceitou_termos": true }
+```
+
+A trava fica no banco: o trigger só cria a conta se houver uma autorização em `cadastros_autorizados`, válida por 10 minutos, e só administradores gravam ali. Por isso chamar o cadastro do Supabase Auth direto, com a chave pública, não cria conta. Contas criadas em **Authentication > Add user** também são recusadas.
+
+O primeiro administrador é autorizado pelo SQL Editor, com o comando no fim de `20261112000100_cadastro_por_admin.sql`, e cadastrado logo depois.
 
 ### Registrar reunião
 
