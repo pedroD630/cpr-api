@@ -36,7 +36,7 @@ As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_to
 |---|---|---|
 | POST | `/api/auth/login` | Entra e devolve a sessão |
 | POST | `/api/auth/renovar` | Troca o `refresh_token` por uma nova sessão |
-| PUT | `/api/auth/senha` 🔒 | Troca a senha. Corpo: `senha_atual` e `nova_senha` |
+| PUT | `/api/auth/senha` 🔒 | Troca a senha. Corpo: `senha_atual` e `nova_senha`. As outras sessões são encerradas, e a resposta traz a nova `sessao` |
 | GET | `/api/congregacao` 🔒 | Dados da congregação logada, incluindo `admin` |
 | POST | `/api/congregacao` 🔒 | Só administradores. Cadastra uma congregação |
 | GET | `/api/reuniao` 🔒 | Histórico, da reunião mais recente para a mais antiga. Filtros opcionais: `?data=2026-11-04` e `?tipo=mds` |

@@ -65,7 +65,7 @@ export async function alterarSenha(req, res) {
     // Confirma a senha atual entrando de novo. O cliente guarda essa sessão só na
     // memória desta requisição, e ela é usada para gravar a nova senha.
     const supabase = criarCliente();
-    const { error: erroLogin } = await supabase.auth.signInWithPassword({
+    const { data: login, error: erroLogin } = await supabase.auth.signInWithPassword({
         email: req.usuario.email,
         password: senha_atual
     });
@@ -79,5 +79,7 @@ export async function alterarSenha(req, res) {
     const { error } = await supabase.auth.updateUser({ password: nova_senha });
     if (error) throw error;
 
-    res.json({ sucesso: true, mensagem: "Senha alterada" });
+    // O Supabase encerra as outras sessões ao trocar a senha, inclusive a do app.
+    // Só a sessão aberta acima continua válida, então ela volta para o app.
+    res.json({ sucesso: true, mensagem: "Senha alterada", sessao: formatarSessao(login.session) });
 }
