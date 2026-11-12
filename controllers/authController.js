@@ -1,8 +1,9 @@
 import { isAuthError } from "@supabase/supabase-js";
 import { ErroApi } from "../utils/erroApi.js";
 import { criarCliente } from "../utils/supabase.js";
+import { loginParaEmail } from "../utils/login.js";
 
-function formatarSessao(sessao) {
+export function formatarSessao(sessao) {
     return {
         access_token: sessao.access_token,
         refresh_token: sessao.refresh_token,
@@ -11,39 +12,24 @@ function formatarSessao(sessao) {
     };
 }
 
-function exigirCredenciais({ email, senha } = {}) {
-    if (typeof email !== "string" || !email || typeof senha !== "string" || !senha) {
-        throw new ErroApi(400, "Informe e-mail e senha");
-    }
-    return { email, password: senha };
-}
-
-export async function cadastrar(req, res) {
-    const credenciais = exigirCredenciais(req.body);
-    const { nome_congregacao, aceitou_termos } = req.body;
-
-    if (typeof nome_congregacao !== "string" || !nome_congregacao.trim()) {
-        throw new ErroApi(400, "Informe o nome da congregação");
-    }
-    if (aceitou_termos !== true) {
-        throw new ErroApi(400, "É preciso aceitar os termos de uso");
-    }
-
-    const { data, error } = await criarCliente().auth.signUp({
-        ...credenciais,
-        options: { data: { nome_congregacao, termos_aceitos_em: new Date().toISOString() } }
-    });
-    if (error) throw error;
-
-    // Sem sessão, o projeto exige confirmar o e-mail antes do primeiro login.
-    res.status(201).json({
-        confirmacao_pendente: !data.session,
-        sessao: data.session ? formatarSessao(data.session) : null
-    });
+function exigirTexto(valor, mensagem) {
+    if (typeof valor !== "string" || !valor) throw new ErroApi(400, mensagem);
+    return valor;
 }
 
 export async function entrar(req, res) {
-    const { data, error } = await criarCliente().auth.signInWithPassword(exigirCredenciais(req.body));
+    const { login, senha } = req.body ?? {};
+    exigirTexto(login, "Informe usuário e senha");
+    exigirTexto(senha, "Informe usuário e senha");
+
+    const { data, error } = await criarCliente().auth.signInWithPassword({
+        email: loginParaEmail(login),
+        password: senha
+    });
+
+    if (error?.code === "invalid_credentials") {
+        throw new ErroApi(401, "Usuário ou senha inválidos");
+    }
     if (error) throw error;
 
     res.json({ sessao: formatarSessao(data.session) });
@@ -51,10 +37,7 @@ export async function entrar(req, res) {
 
 export async function renovarSessao(req, res) {
     const { refresh_token } = req.body ?? {};
-
-    if (typeof refresh_token !== "string" || !refresh_token) {
-        throw new ErroApi(400, "Informe o refresh_token");
-    }
+    exigirTexto(refresh_token, "Informe o refresh_token");
 
     const { data, error } = await criarCliente().auth.refreshSession({ refresh_token });
 
