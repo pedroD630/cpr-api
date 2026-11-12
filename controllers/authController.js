@@ -3,6 +3,8 @@ import { ErroApi } from "../utils/erroApi.js";
 import { criarCliente } from "../utils/supabase.js";
 import { loginParaEmail } from "../utils/login.js";
 
+const SENHA_MINIMA = 6;
+
 export function formatarSessao(sessao) {
     return {
         access_token: sessao.access_token,
@@ -49,4 +51,33 @@ export async function renovarSessao(req, res) {
     if (error) throw error;
 
     res.json({ sessao: formatarSessao(data.session) });
+}
+
+export async function alterarSenha(req, res) {
+    const { senha_atual, nova_senha } = req.body ?? {};
+    exigirTexto(senha_atual, "Informe a senha atual");
+    exigirTexto(nova_senha, "Informe a nova senha");
+
+    if (nova_senha.length < SENHA_MINIMA) {
+        throw new ErroApi(400, `A nova senha precisa ter pelo menos ${SENHA_MINIMA} caracteres`);
+    }
+
+    // Confirma a senha atual entrando de novo. O cliente guarda essa sessão só na
+    // memória desta requisição, e ela é usada para gravar a nova senha.
+    const supabase = criarCliente();
+    const { error: erroLogin } = await supabase.auth.signInWithPassword({
+        email: req.usuario.email,
+        password: senha_atual
+    });
+
+    // 400 e não 401: a sessão do usuário continua válida, só a senha digitada não.
+    if (erroLogin?.code === "invalid_credentials") {
+        throw new ErroApi(400, "Senha atual incorreta");
+    }
+    if (erroLogin) throw erroLogin;
+
+    const { error } = await supabase.auth.updateUser({ password: nova_senha });
+    if (error) throw error;
+
+    res.json({ sucesso: true, mensagem: "Senha alterada" });
 }

@@ -20,6 +20,7 @@ const ERROS_AUTH = {
     user_already_exists: [409, "E-mail já cadastrado"],
     email_exists: [409, "E-mail já cadastrado"],
     weak_password: [400, "Senha muito fraca"],
+    same_password: [400, "A nova senha deve ser diferente da atual"],
     email_address_invalid: [400, "E-mail inválido"],
     // O e-mail padrão do Supabase só envia para a equipe do projeto.
     email_address_not_authorized: [503, "Cadastro indisponível no momento. Fale com o responsável pelo app"],
