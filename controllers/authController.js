@@ -1,3 +1,4 @@
+import { isAuthError } from "@supabase/supabase-js";
 import { ErroApi } from "../utils/erroApi.js";
 import { criarCliente } from "../utils/supabase.js";
 
@@ -56,6 +57,12 @@ export async function renovarSessao(req, res) {
     }
 
     const { data, error } = await criarCliente().auth.refreshSession({ refresh_token });
+
+    // O Supabase usa códigos diferentes para token vencido, reutilizado ou
+    // malformado. Para o app, todos significam fazer login de novo.
+    if (isAuthError(error) && error.status >= 400 && error.status < 500) {
+        throw new ErroApi(401, "Sessão inválida ou expirada");
+    }
     if (error) throw error;
 
     res.json({ sessao: formatarSessao(data.session) });
