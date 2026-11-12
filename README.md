@@ -8,7 +8,7 @@ Requer Node.js 22 ou superior.
 
 1. No SQL Editor do Supabase, rode os arquivos de `supabase/migrations/`, em ordem e uma única vez.
 2. Copie `.env.example` para `.env` e preencha as variáveis.
-3. Instale e rode:
+3. Instale e rode localmente, com o `.env`:
 
 ```bash
 npm install
@@ -24,6 +24,10 @@ npm run dev
 
 A API não precisa da chave secreta do Supabase. Cada consulta usa o token do usuário logado, e o RLS do banco faz o isolamento entre congregações. Nunca coloque a chave secreta nem o `.env` no Git.
 
+## Deploy no Render
+
+O serviço roda `npm install` e `npm start`, sem arquivo `.env`: cadastre as variáveis acima em **Environment** no painel do serviço.
+
 ## Rotas
 
 As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_token>`.
@@ -36,6 +40,7 @@ As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <access_to
 | GET | `/api/congregacao` 🔒 | Dados da congregação logada |
 | GET | `/api/reuniao` 🔒 | Histórico, da reunião mais recente para a mais antiga. Filtros opcionais: `?data=2026-11-04` e `?tipo=mds` |
 | POST | `/api/reuniao` 🔒 | Registra uma reunião concluída |
+| PUT | `/api/reuniao/:id` 🔒 | Substitui os dados e as partes de uma reunião, com o mesmo corpo do POST |
 | DELETE | `/api/reuniao/:id` 🔒 | Exclui uma reunião |
 
 ### Cadastro e login

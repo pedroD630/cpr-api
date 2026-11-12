@@ -12,7 +12,7 @@ const { CORS_ORIGIN } = process.env;
 app.use(cors({ origin: CORS_ORIGIN ? CORS_ORIGIN.split(',') : true }));
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/congregacao', congregacaoRoutes);

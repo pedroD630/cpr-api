@@ -28,6 +28,18 @@ export async function inserirReuniao(req, res) {
     res.status(201).json({ sucesso: true, id });
 }
 
+export async function atualizarReuniao(req, res) {
+    const parametros = validarReuniao(req.body);
+
+    const { error } = await req.supabase.rpc("atualizar_reuniao", {
+        p_id: req.params.id,
+        ...parametros
+    });
+    if (error) throw error;
+
+    res.json({ sucesso: true, mensagem: "Reunião atualizada com sucesso" });
+}
+
 export async function deletarReuniao(req, res) {
     const { data, error } = await req.supabase
         .from("reunioes")

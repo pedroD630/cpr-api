@@ -8,6 +8,7 @@ const ERROS_BANCO = {
     "22P02": [400, "Dado em formato inválido"],
     "22007": [400, "Data ou hora inválida"],
     "22008": [400, "Data ou hora inválida"],
+    "P0002": [404, "Reunião não encontrada"],
     "42501": [403, "Acesso negado"],
     "PGRST301": [401, "Sessão inválida ou expirada"],
     "PGRST303": [401, "Sessão inválida ou expirada"]
